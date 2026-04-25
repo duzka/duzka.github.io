@@ -8,6 +8,15 @@
 </head>
 <body>
 
+  <!-- Hintergrundmusik – ersetze src mit deiner Datei -->
+  <audio id="bg-music" loop preload="auto">
+    <source src="audio/background.mp3" type="audio/mpeg" />
+    <source src="audio/background.ogg" type="audio/ogg" />
+  </audio>
+
+  <!-- Mute-Button -->
+  <button id="mute-btn" aria-label="Ton an/aus" title="Ton an/aus">♪</button>
+
   <header>
     <h1>Im System</h1>
     <p class="subtitle">Alltag in der Sozialen Arbeit</p>
@@ -102,28 +111,195 @@
   </footer>
 
   <script>
-    const panels = document.querySelectorAll('.panel');
-    const panel16 = document.getElementById('panel-16');
+    // ── Audio setup ──────────────────────────────────────────────────────────
+    const bgMusic = document.getElementById('bg-music');
+    const muteBtn = document.getElementById('mute-btn');
+    let audioCtx = null;
+    let audioReady = false;
+    let muted = false;
+
+    function initAudio() {
+      if (audioReady) return;
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      bgMusic.volume = 0.7;
+      bgMusic.play().catch(() => {});
+      audioReady = true;
+    }
+
+    // Start on first scroll or click (browser autoplay policy)
+    ['scroll', 'click', 'touchstart'].forEach((evt) =>
+      document.addEventListener(evt, initAudio, { once: true })
+    );
+
+    muteBtn.addEventListener('click', () => {
+      muted = !muted;
+      bgMusic.muted = muted;
+      muteBtn.textContent = muted ? '♪̶' : '♪';
+      muteBtn.setAttribute('aria-label', muted ? 'Ton einschalten' : 'Ton ausschalten');
+      if (!muted && !audioReady) initAudio();
+    });
+
+    // ── Volume fade helpers ───────────────────────────────────────────────────
+    function fadeTo(targetVol, durationMs, onDone) {
+      const startVol = bgMusic.volume;
+      const steps = 30;
+      const interval = durationMs / steps;
+      const delta = (targetVol - startVol) / steps;
+      let count = 0;
+      const timer = setInterval(() => {
+        count++;
+        bgMusic.volume = Math.max(0, Math.min(1, bgMusic.volume + delta));
+        if (count >= steps) {
+          clearInterval(timer);
+          bgMusic.volume = targetVol;
+          if (onDone) onDone();
+        }
+      }, interval);
+    }
+
+    function duckAndRestore(durationOut, holdMs, durationIn) {
+      fadeTo(0, durationOut, () => {
+        setTimeout(() => fadeTo(0.7, durationIn), holdMs);
+      });
+    }
+
+    // ── Synthesized sound effects (Web Audio API) ─────────────────────────────
+
+    // Panel 4: Akten-Explosion – tiefes Rumpeln + Rauschen
+    function playExplosion() {
+      if (!audioCtx) return;
+      const now = audioCtx.currentTime;
+
+      // White noise burst
+      const bufLen = Math.floor(audioCtx.sampleRate * 0.8);
+      const buf = audioCtx.createBuffer(1, bufLen, audioCtx.sampleRate);
+      const data = buf.getChannelData(0);
+      for (let i = 0; i < bufLen; i++) {
+        data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / bufLen, 1.5);
+      }
+      const noise = audioCtx.createBufferSource();
+      noise.buffer = buf;
+
+      const noiseFilter = audioCtx.createBiquadFilter();
+      noiseFilter.type = 'bandpass';
+      noiseFilter.frequency.value = 300;
+      noiseFilter.Q.value = 0.5;
+
+      const noiseGain = audioCtx.createGain();
+      noiseGain.gain.setValueAtTime(1.2, now);
+      noiseGain.gain.exponentialRampToValueAtTime(0.001, now + 0.8);
+
+      noise.connect(noiseFilter);
+      noiseFilter.connect(noiseGain);
+      noiseGain.connect(audioCtx.destination);
+      noise.start(now);
+
+      // Low thud
+      const osc = audioCtx.createOscillator();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(90, now);
+      osc.frequency.exponentialRampToValueAtTime(30, now + 0.5);
+
+      const thudGain = audioCtx.createGain();
+      thudGain.gain.setValueAtTime(1.5, now);
+      thudGain.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
+
+      osc.connect(thudGain);
+      thudGain.connect(audioCtx.destination);
+      osc.start(now);
+      osc.stop(now + 0.5);
+    }
+
+    // Panel 16: FUCK THE SYSTEM – aggressiver Buzz + Distortion
+    function playFuckTheSystem() {
+      if (!audioCtx) return;
+      const now = audioCtx.currentTime;
+
+      [55, 110, 165].forEach((freq, i) => {
+        const osc = audioCtx.createOscillator();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(freq, now);
+
+        const gain = audioCtx.createGain();
+        gain.gain.setValueAtTime(0.5 - i * 0.1, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.6);
+
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start(now);
+        osc.stop(now + 0.6);
+      });
+
+      // High scratch
+      const scratch = audioCtx.createOscillator();
+      scratch.type = 'square';
+      scratch.frequency.setValueAtTime(800, now);
+      scratch.frequency.linearRampToValueAtTime(200, now + 0.15);
+
+      const scratchGain = audioCtx.createGain();
+      scratchGain.gain.setValueAtTime(0.3, now);
+      scratchGain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
+
+      scratch.connect(scratchGain);
+      scratchGain.connect(audioCtx.destination);
+      scratch.start(now);
+      scratch.stop(now + 0.15);
+    }
+
+    // Panel 20: Abschluss – sanfte Dur-Terz (C-E-G)
+    function playEnding() {
+      if (!audioCtx) return;
+      const now = audioCtx.currentTime;
+
+      [523.25, 659.25, 783.99].forEach((freq, i) => {
+        const osc = audioCtx.createOscillator();
+        osc.type = 'sine';
+        osc.frequency.value = freq;
+
+        const gain = audioCtx.createGain();
+        gain.gain.setValueAtTime(0, now + i * 0.15);
+        gain.gain.linearRampToValueAtTime(0.25, now + i * 0.15 + 0.02);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.15 + 2.0);
+
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start(now + i * 0.15);
+        osc.stop(now + i * 0.15 + 2.0);
+      });
+    }
+
+    // ── IntersectionObserver ──────────────────────────────────────────────────
+    const panel16el = document.getElementById('panel-16');
+
+    const SOUND_PANELS = {
+      4:  () => { duckAndRestore(400, 800, 800); playExplosion(); },
+      16: () => { duckAndRestore(200, 700, 600); playFuckTheSystem(); },
+      20: () => { duckAndRestore(600, 2000, 1200); playEnding(); },
+    };
 
     const observer = new IntersectionObserver((entries) => {
       entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          const el = entry.target;
-          el.classList.add('visible');
+        if (!entry.isIntersecting) return;
 
-          if (el === panel16) {
-            el.classList.remove('shake-active');
-            // reflow to restart animation
-            void el.offsetWidth;
-            el.classList.add('shake-active');
-          }
+        const el = entry.target;
+        el.classList.add('visible');
 
-          observer.unobserve(el);
+        if (el === panel16el) {
+          el.classList.remove('shake-active');
+          void el.offsetWidth;
+          el.classList.add('shake-active');
         }
+
+        const panelNum = parseInt(el.dataset.panel, 10);
+        if (SOUND_PANELS[panelNum] && audioReady && !muted) {
+          SOUND_PANELS[panelNum]();
+        }
+
+        observer.unobserve(el);
       });
     }, { threshold: 0.15 });
 
-    panels.forEach((panel) => observer.observe(panel));
+    document.querySelectorAll('.panel').forEach((p) => observer.observe(p));
   </script>
 
 </body>

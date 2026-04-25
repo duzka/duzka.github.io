@@ -75,6 +75,29 @@ header p.subtitle {
   animation: shake 0.4s ease;
 }
 
+/* Mute button */
+#mute-btn {
+  position: fixed;
+  bottom: 1.2rem;
+  right: 1.2rem;
+  z-index: 100;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #ddd;
+  font-size: 1.2rem;
+  width: 2.6rem;
+  height: 2.6rem;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+  line-height: 1;
+}
+
+#mute-btn:hover {
+  background: rgba(255, 255, 255, 0.18);
+  color: #fff;
+}
+
 footer {
   text-align: center;
   padding: 2.5rem 1rem;
