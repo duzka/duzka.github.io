@@ -120,6 +120,7 @@
     let audioReady  = false;
     let muted       = false;
     let panel1Played = false;
+    let panel1Audio  = null;
     const playedPanels = new Set();
 
     const PANEL_SOUNDS = {
@@ -131,9 +132,9 @@
     function playPanel1Sound() {
       if (panel1Played) return;
       panel1Played = true;
-      const audio = new Audio('sounds/panel-01.mp3');
-      audio.volume = 0.7;
-      audio.play().catch(() => {});
+      panel1Audio = new Audio('sounds/panel-01.mp3');
+      panel1Audio.volume = 0.7;
+      panel1Audio.play().catch(() => {});
     }
 
     // ── Init on first interaction ─────────────────────────────────────────────
@@ -313,6 +314,27 @@
         visualObserver.observe(p);
         soundObserver.observe(p);
       });
+
+      // Panel 2 sichtbar → Panel-1-Sound ausblenden
+      const panel2el = document.querySelector('[data-panel="2"]');
+      const panel1FadeObserver = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          if (panel1Audio && !panel1Audio.paused) {
+            const fadeOutPanel1 = setInterval(() => {
+              if (panel1Audio.volume > 0.05) {
+                panel1Audio.volume = Math.max(0, panel1Audio.volume - 0.05);
+              } else {
+                panel1Audio.volume = 0;
+                panel1Audio.pause();
+                clearInterval(fadeOutPanel1);
+              }
+            }, 100);
+          }
+          panel1FadeObserver.unobserve(panel2el);
+        });
+      }, { threshold: 0.3 });
+      panel1FadeObserver.observe(panel2el);
     }
 
     document.getElementById('start-btn').addEventListener('click', startComic);
