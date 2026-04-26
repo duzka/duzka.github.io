@@ -113,12 +113,22 @@
     const soundHint = document.getElementById('sound-hint');
     let audioReady  = false;
     let muted       = false;
+    let panel1Played = false;
     const playedPanels = new Set();
 
     const PANEL_SOUNDS = {
       17: { src: 'sounds/panel-17.mp3', volume: 0.7 },
       18: { src: 'sounds/panel-18.mp3', volume: 0.7 },
     };
+
+    // ── Panel 1 sound (eigene Funktion wegen Autoplay-Timing) ────────────────
+    function playPanel1Sound() {
+      if (panel1Played) return;
+      panel1Played = true;
+      const audio = new Audio('sounds/panel-01.mp3');
+      audio.volume = 0.7;
+      audio.play().catch(() => {});
+    }
 
     // ── Init on first interaction ─────────────────────────────────────────────
     function initAudio() {
@@ -127,6 +137,8 @@
       soundHint.classList.add('hidden');
       bgMusic.volume = 0.4;
       bgMusic.play().catch(() => {});
+      // Stelle A: Panel 1 war schon sichtbar bevor User geklickt hat
+      if (playedPanels.has(1) && !muted) playPanel1Sound();
     }
 
     ['click', 'touchstart'].forEach((evt) =>
@@ -179,14 +191,8 @@
       const panel1 = document.querySelector('[data-panel="1"]');
       // opacity 0→1, translateY(12px)→0 über 600ms (via .visible CSS transition)
       panel1.classList.add('visible');
-
-      if (audioReady && !muted) {
-        try {
-          const a = new Audio('sounds/panel-01.mp3');
-          a.volume = 0.7;
-          a.play().catch(() => {});
-        } catch (e) {}
-      }
+      // Stelle B: User hat schon geklickt → Sound sofort abspielen
+      if (audioReady && !muted) playPanel1Sound();
     }
 
     // ── Panel 4 explosion ─────────────────────────────────────────────────────
