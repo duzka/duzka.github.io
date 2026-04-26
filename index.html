@@ -7,7 +7,7 @@
   <link rel="stylesheet" href="style.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Bangers&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&display=swap" rel="stylesheet" />
 </head>
 <body>
 
@@ -17,12 +17,11 @@
 
   <button id="mute-btn" aria-label="Ton ausschalten" title="Ton an/aus">🔊</button>
 
-  <div id="title-screen">
-    <div class="title-content">
-      <h1>Im System</h1>
-      <p>Alltag in der Sozialen Arbeit</p>
-      <button id="start-btn">▶ Starten</button>
-    </div>
+  <div id="title-screen" class="comic-splash">
+    <h1 class="splash-title">Im System</h1>
+    <p class="splash-sub">Alltag in der Sozialen Arbeit</p>
+    <div class="brush-stroke brush-stroke--title"></div>
+    <button id="start-btn">▶ Starten</button>
   </div>
 
   <header>
@@ -109,10 +108,9 @@
       <img src="slides/Panel20.02.jpg" alt="Und ich merkte, dass trotz all des Chaos draußen immer noch kleine Dinge passieren, die sich nicht kaputtregeln lassen." />
     </div>
 
-    <div id="end-page" class="end-page">
+    <div id="end-page" class="end-page comic-splash">
       <div class="end-text">The End</div>
-      <div class="end-heart">♥</div>
-      <p class="end-caption">Eine Geschichte aus der Sozialen Arbeit.</p>
+      <div class="brush-stroke brush-stroke--end"></div>
     </div>
 
   </main>
@@ -314,37 +312,25 @@
     function animateEndPage() {
       const endPage = document.getElementById('end-page');
       const text    = endPage.querySelector('.end-text');
-      const heart   = endPage.querySelector('.end-heart');
-      const caption = endPage.querySelector('.end-caption');
 
       // Phase 1 (0–800ms): opacity 0→1, scale 0.8→1.05
       text.style.transition = 'opacity 800ms ease-out, transform 800ms ease-out';
       text.style.opacity    = '1';
-      text.style.transform  = 'scale(1.05)';
+      text.style.transform  = 'scale(1.05) rotate(-1.5deg)';
 
       // Phase 2 (800ms): settle scale→1, dann Puls
       setTimeout(() => {
         text.style.transition = 'transform 100ms ease-out';
-        text.style.transform  = 'scale(1)';
+        text.style.transform  = 'scale(1) rotate(-1.5deg)';
         setTimeout(() => {
           text.style.transition = 'transform 200ms ease-out';
-          text.style.transform  = 'scale(1.03)';
+          text.style.transform  = 'scale(1.03) rotate(-1.5deg)';
           setTimeout(() => {
             text.style.transition = 'transform 200ms ease-out';
-            text.style.transform  = 'scale(1)';
+            text.style.transform  = 'scale(1) rotate(-1.5deg)';
           }, 200);
         }, 100);
       }, 800);
-
-      // Herz und Caption einblenden
-      setTimeout(() => {
-        heart.style.transition   = 'opacity 600ms ease-out';
-        heart.style.opacity      = '1';
-      }, 500);
-      setTimeout(() => {
-        caption.style.transition = 'opacity 600ms ease-out';
-        caption.style.opacity    = '1';
-      }, 900);
 
       // Hintergrundmusik über 3 Sekunden ausblenden
       fadeBgTo(0, 3000);
