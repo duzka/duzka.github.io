@@ -178,6 +178,7 @@ header p.subtitle {
   font-size: clamp(2.5rem, 8vw, 5rem);
   color: white;
   letter-spacing: 0.02em;
+  text-align: center;
   transform: rotate(-1deg);
   animation: splash-in 600ms ease-out both;
 }
