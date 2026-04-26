@@ -218,6 +218,16 @@ header p.subtitle {
   line-height: 1.6;
 }
 
+.title-authors {
+  font-family: 'Quicksand', sans-serif;
+  font-size: 0.8rem;
+  color: #555;
+  text-align: center;
+  line-height: 1.6;
+  position: absolute;
+  bottom: 2rem;
+}
+
 /* The End page */
 .end-page {
   grid-column: span 2;
