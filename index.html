@@ -14,7 +14,13 @@
 
   <button id="mute-btn" aria-label="Ton ausschalten" title="Ton an/aus">🔊</button>
 
-  <div id="sound-hint">🔊 Klicke irgendwo für Sound</div>
+  <div id="title-screen">
+    <div class="title-content">
+      <h1>Im System</h1>
+      <p>Alltag in der Sozialen Arbeit</p>
+      <button id="start-btn">▶ Starten</button>
+    </div>
+  </div>
 
   <header>
     <h1>Im System</h1>
@@ -134,7 +140,7 @@
     function initAudio() {
       if (audioReady) return;
       audioReady = true;
-      soundHint.classList.add('hidden');
+      if (soundHint) soundHint.classList.add('hidden');
       bgMusic.volume = 0.4;
       bgMusic.play().catch(() => {});
       // Stelle A: Panel 1 war schon sichtbar bevor User geklickt hat
@@ -297,10 +303,19 @@
       });
     }, { threshold: 0.4 });
 
-    document.querySelectorAll('.panel').forEach((p) => {
-      visualObserver.observe(p);
-      soundObserver.observe(p);
-    });
+    // ── Starten-Button ────────────────────────────────────────────────────────
+    function startComic() {
+      initAudio();
+      const screen = document.getElementById('title-screen');
+      screen.classList.add('hidden');
+      setTimeout(() => { screen.style.display = 'none'; }, 800);
+      document.querySelectorAll('.panel').forEach((p) => {
+        visualObserver.observe(p);
+        soundObserver.observe(p);
+      });
+    }
+
+    document.getElementById('start-btn').addEventListener('click', startComic);
   </script>
 
 </body>

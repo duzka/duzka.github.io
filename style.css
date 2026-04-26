@@ -126,25 +126,57 @@ header p.subtitle {
   background: rgba(255, 255, 255, 0.18);
 }
 
-/* Sound hint banner */
-#sound-hint {
+/* Title screen */
+#title-screen {
   position: fixed;
-  bottom: 1.2rem;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 100;
-  background: rgba(0, 0, 0, 0.75);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  color: #ccc;
-  font-size: 0.85rem;
-  padding: 0.5rem 1rem;
-  border-radius: 2rem;
-  pointer-events: none;
-  transition: opacity 0.4s ease;
+  inset: 0;
+  z-index: 200;
+  background: #111111;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.8s ease;
 }
 
-#sound-hint.hidden {
+#title-screen.hidden {
   opacity: 0;
+  pointer-events: none;
+}
+
+.title-content {
+  text-align: center;
+}
+
+.title-content h1 {
+  font-size: clamp(2rem, 8vw, 5rem);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #f0f0f0;
+  margin-bottom: 0.5rem;
+}
+
+.title-content p {
+  font-size: clamp(0.9rem, 2vw, 1.2rem);
+  color: #888;
+  font-style: italic;
+  margin-bottom: 2.5rem;
+}
+
+#start-btn {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: #ccc;
+  font-family: 'Georgia', serif;
+  font-size: 1rem;
+  padding: 0.75rem 2.5rem;
+  letter-spacing: 0.12em;
+  cursor: pointer;
+  transition: border-color 0.2s, color 0.2s;
+}
+
+#start-btn:hover {
+  border-color: #ffffff;
+  color: #ffffff;
 }
 
 footer {
