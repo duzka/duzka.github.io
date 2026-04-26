@@ -181,7 +181,7 @@ header p.subtitle {
 
 .splash-title {
   font-family: 'Back Issues', 'Bangers', Impact, sans-serif;
-  font-size: clamp(3rem, 10vw, 6rem);
+  font-size: clamp(1.8rem, 5vw, 3.5rem);
   color: white;
   letter-spacing: 0.05em;
   text-align: center;
