@@ -87,6 +87,7 @@
     </div>
 
     <div class="panel full-width" id="panel-16" data-panel="16">
+      <div class="red-overlay"></div>
       <img src="slides/Panel16.02.jpg" alt="FUCK THE SYSTEM." />
     </div>
 
@@ -123,8 +124,10 @@
     const soundHint = document.getElementById('sound-hint');
     let audioReady  = false;
     let muted       = false;
-    let panel1Played = false;
-    let panel1Audio  = null;
+    let panel1Played  = false;
+    let panel1Audio   = null;
+    let panel16Played = false;
+    let panel16Audio  = null;
     const playedPanels = new Set();
 
     const PANEL_SOUNDS = {};
@@ -203,6 +206,63 @@
       if (audioReady && !muted) playPanel1Sound();
     }
 
+    // ── Panel 16 – roter Blitz + Screen-Shake + Sound ────────────────────────
+    function triggerPanel16() {
+      if (panel16Played) return;
+      panel16Played = true;
+
+      const panel16  = document.getElementById('panel-16');
+      const img      = panel16.querySelector('img');
+      const redOverlay = panel16.querySelector('.red-overlay');
+
+      // Sound + Musik-Ducking
+      if (audioReady && !muted) {
+        try {
+          panel16Audio = new Audio('sounds/panel-16.mp3');
+          panel16Audio.volume = 1.0;
+          panel16Audio.play().catch(() => {});
+        } catch (e) {}
+        fadeBgTo(0.15, 300, () => {
+          setTimeout(() => fadeBgTo(0.4, 1000), 2000);
+        });
+      }
+
+      // Phase 1 (0–120ms): Roter Blitz
+      redOverlay.style.transition = 'opacity 60ms ease-in';
+      redOverlay.style.opacity    = '0.75';
+      setTimeout(() => {
+        redOverlay.style.transition = 'opacity 60ms ease-out';
+        redOverlay.style.opacity    = '0';
+      }, 60);
+
+      // Phase 2 (80ms): Screen-Shake + Bild-Rotation
+      setTimeout(() => {
+        document.body.classList.remove('shake');
+        void document.body.offsetWidth;
+        document.body.classList.add('shake');
+
+        img.style.transition = 'transform 140ms ease-in-out';
+        img.style.transform  = 'rotate(-1.5deg)';
+        setTimeout(() => {
+          img.style.transform = 'rotate(1.5deg)';
+          setTimeout(() => {
+            img.style.transform = 'rotate(0deg)';
+          }, 140);
+        }, 140);
+      }, 80);
+
+      // Phase 3 (500ms): Shake-Klasse entfernen
+      setTimeout(() => {
+        document.body.classList.remove('shake');
+      }, 500);
+
+      // Phase 3 Ende (1500ms): Sicherheits-Reset
+      setTimeout(() => {
+        img.style.transition = 'transform 200ms ease-out';
+        img.style.transform  = 'rotate(0deg)';
+      }, 1500);
+    }
+
     // ── Panel 4 explosion ─────────────────────────────────────────────────────
     function triggerPanel4Explosion() {
       const panel4 = document.querySelector('[data-panel="4"]');
@@ -276,11 +336,6 @@
         const el = entry.target;
         if (el.dataset.panel === '1') { visualObserver.unobserve(el); return; }
         el.classList.add('visible');
-        if (el === panel16el) {
-          el.classList.remove('shake-active');
-          void el.offsetWidth;
-          el.classList.add('shake-active');
-        }
         visualObserver.unobserve(el);
       });
     }, { threshold: 0.15 });
@@ -297,6 +352,8 @@
             triggerPanel1Animation();
           } else if (panelNum === 4) {
             triggerPanel4Explosion();
+          } else if (panelNum === 16) {
+            triggerPanel16();
           } else if (audioReady && !muted) {
             playPanelSound(panelNum);
           }
@@ -345,6 +402,27 @@
         });
       }, { threshold: 0.3 });
       panel1FadeObserver.observe(panel2el);
+
+      // Panel 17 sichtbar → Panel-16-Sound ausblenden
+      const panel17el = document.querySelector('[data-panel="17"]');
+      const panel16FadeObserver = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          if (panel16Audio && !panel16Audio.paused) {
+            const fadeOut16 = setInterval(() => {
+              if (panel16Audio.volume > 0.07) {
+                panel16Audio.volume = Math.max(0, panel16Audio.volume - 0.07);
+              } else {
+                panel16Audio.volume = 0;
+                panel16Audio.pause();
+                clearInterval(fadeOut16);
+              }
+            }, 100);
+          }
+          panel16FadeObserver.unobserve(panel17el);
+        });
+      }, { threshold: 0.3 });
+      panel16FadeObserver.observe(panel17el);
 
       // End-Page Observer
       const endPageEl = document.getElementById('end-page');

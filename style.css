@@ -66,10 +66,37 @@ header p.subtitle {
   transform: translateY(12px);
 }
 
-/* Panel 4 explosion */
-[data-panel="4"] {
+/* Panel 4 + 16 brauchen position:relative für Overlays */
+[data-panel="4"],
+#panel-16 {
   position: relative;
 }
+
+.red-overlay {
+  position: absolute;
+  inset: 0;
+  background: #cc0000;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 10;
+}
+
+@keyframes screenShake {
+  0%   { transform: translateX(0); }
+  15%  { transform: translateX(-8px); }
+  30%  { transform: translateX(8px); }
+  45%  { transform: translateX(-6px); }
+  60%  { transform: translateX(6px); }
+  75%  { transform: translateX(-4px); }
+  90%  { transform: translateX(4px); }
+  100% { transform: translateX(0); }
+}
+
+.shake {
+  animation: screenShake 420ms ease-in-out;
+}
+
+/* Panel 4 explosion */
 
 .flash-overlay {
   position: absolute;
