@@ -197,18 +197,17 @@ header p.subtitle {
 #start-btn {
   background: transparent;
   border: 1px solid rgba(255, 255, 255, 0.3);
-  color: #ccc;
-  font-family: 'Georgia', serif;
-  font-size: 1rem;
+  border-radius: 20px;
+  color: white;
+  font-family: 'Quicksand', sans-serif;
+  font-size: 1.2rem;
   padding: 0.75rem 2.5rem;
-  letter-spacing: 0.12em;
   cursor: pointer;
-  transition: border-color 0.2s, color 0.2s;
+  transition: border-color 0.2s;
 }
 
 #start-btn:hover {
   border-color: #ffffff;
-  color: #ffffff;
 }
 
 /* The End page */
