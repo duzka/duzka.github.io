@@ -17,10 +17,8 @@
 
   <button id="mute-btn" aria-label="Ton ausschalten" title="Ton an/aus">🔊</button>
 
-  <div id="title-screen" class="comic-splash">
+  <div id="title-screen">
     <h1 class="splash-title">Im System</h1>
-    <p class="splash-sub">Alltag in der Sozialen Arbeit</p>
-    <div class="brush-stroke brush-stroke--title"></div>
     <button id="start-btn">▶ Starten</button>
   </div>
 
@@ -108,9 +106,8 @@
       <img src="slides/Panel20.02.jpg" alt="Und ich merkte, dass trotz all des Chaos draußen immer noch kleine Dinge passieren, die sich nicht kaputtregeln lassen." />
     </div>
 
-    <div id="end-page" class="end-page comic-splash">
+    <div id="end-page" class="end-page">
       <div class="end-text">The End</div>
-      <div class="brush-stroke brush-stroke--end"></div>
     </div>
 
   </main>
@@ -310,29 +307,10 @@
 
     // ── The End – Animation + Musikfade ──────────────────────────────────────
     function animateEndPage() {
-      const endPage = document.getElementById('end-page');
-      const text    = endPage.querySelector('.end-text');
-
-      // Phase 1 (0–800ms): opacity 0→1, scale 0.8→1.05
-      text.style.transition = 'opacity 800ms ease-out, transform 800ms ease-out';
+      const text = document.querySelector('#end-page .end-text');
+      text.style.transition = 'opacity 600ms ease-out, transform 600ms ease-out';
       text.style.opacity    = '1';
-      text.style.transform  = 'scale(1.05) rotate(-1.5deg)';
-
-      // Phase 2 (800ms): settle scale→1, dann Puls
-      setTimeout(() => {
-        text.style.transition = 'transform 100ms ease-out';
-        text.style.transform  = 'scale(1) rotate(-1.5deg)';
-        setTimeout(() => {
-          text.style.transition = 'transform 200ms ease-out';
-          text.style.transform  = 'scale(1.03) rotate(-1.5deg)';
-          setTimeout(() => {
-            text.style.transition = 'transform 200ms ease-out';
-            text.style.transform  = 'scale(1) rotate(-1.5deg)';
-          }, 200);
-        }, 100);
-      }, 800);
-
-      // Hintergrundmusik über 3 Sekunden ausblenden
+      text.style.transform  = 'translateY(0) rotate(-1.5deg)';
       fadeBgTo(0, 3000);
     }
 

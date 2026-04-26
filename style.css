@@ -126,56 +126,17 @@ header p.subtitle {
   background: rgba(255, 255, 255, 0.18);
 }
 
-/* ── Shared: Titelseite + letzte Seite ───────────────────────────────────── */
-.comic-splash {
-  background-color: #111111;
-  background-image: radial-gradient(circle, #2a2a2a 1.5px, transparent 1.5px);
-  background-size: 20px 20px;
-  box-shadow: inset 0 0 0 8px #cc0000;
-  min-height: 500px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 0.8rem;
-  text-align: center;
-  padding: 2rem;
-}
-
-.splash-title {
-  font-family: 'Permanent Marker', cursive, fantasy;
-  font-size: clamp(2.5rem, 8vw, 5rem);
-  color: white;
-  text-shadow:
-    2px 2px 0px #cc0000,
-    4px 4px 0px rgba(0, 0, 0, 0.4),
-    -1px -1px 0px rgba(255, 255, 255, 0.1);
-  transform: rotate(-1.5deg);
-  line-height: 1.1;
-}
-
-.splash-sub {
-  font-family: 'Permanent Marker', cursive, fantasy;
-  font-size: clamp(1rem, 3vw, 1.5rem);
-  color: #aaaaaa;
-  transform: rotate(0.8deg);
-}
-
-.brush-stroke {
-  height: 6px;
-  background: #cc0000;
-  border-radius: 2px;
-  transform: rotate(-0.5deg);
-}
-
-.brush-stroke--title { width: 60%; }
-.brush-stroke--end   { width: 50%; }
-
 /* Title screen */
 #title-screen {
   position: fixed;
   inset: 0;
   z-index: 200;
+  background: #111111;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2rem;
   transition: opacity 0.8s ease;
 }
 
@@ -184,8 +145,20 @@ header p.subtitle {
   pointer-events: none;
 }
 
+.splash-title {
+  font-family: 'Permanent Marker', cursive;
+  font-size: clamp(2.5rem, 8vw, 5rem);
+  color: white;
+  transform: rotate(-1.5deg);
+  animation: splash-in 600ms ease-out both;
+}
+
+@keyframes splash-in {
+  from { opacity: 0; transform: translateY(10px) rotate(-1.5deg); }
+  to   { opacity: 1; transform: translateY(0)    rotate(-1.5deg); }
+}
+
 #start-btn {
-  margin-top: 0.8rem;
   background: transparent;
   border: 1px solid rgba(255, 255, 255, 0.3);
   color: #ccc;
@@ -205,19 +178,19 @@ header p.subtitle {
 /* The End page */
 .end-page {
   grid-column: span 2;
+  min-height: 500px;
+  background: #111111;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .end-text {
-  font-family: 'Permanent Marker', cursive, fantasy;
+  font-family: 'Permanent Marker', cursive;
   font-size: clamp(4rem, 12vw, 8rem);
   color: white;
-  text-shadow:
-    2px 2px 0px #cc0000,
-    4px 4px 0px rgba(0, 0, 0, 0.4),
-    -1px -1px 0px rgba(255, 255, 255, 0.1);
-  line-height: 1;
   opacity: 0;
-  transform: scale(0.8) rotate(-1.5deg);
+  transform: translateY(10px) rotate(-1.5deg);
 }
 
 footer {
