@@ -210,6 +210,14 @@ header p.subtitle {
   border-color: #ffffff;
 }
 
+.title-meta {
+  font-family: 'Quicksand', sans-serif;
+  font-size: 0.8rem;
+  color: #666;
+  text-align: center;
+  line-height: 1.6;
+}
+
 /* The End page */
 .end-page {
   grid-column: span 2;
