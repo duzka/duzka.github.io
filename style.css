@@ -61,6 +61,30 @@ header p.subtitle {
   height: auto;
 }
 
+/* Panel 4 explosion */
+[data-panel="4"] {
+  position: relative;
+}
+
+.flash-overlay {
+  position: absolute;
+  inset: 0;
+  background: white;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 2;
+}
+
+@keyframes explosion-shake {
+  0%   { transform: scale(1.00) translateX(0px); }
+  14%  { transform: scale(1.02) translateX(-4px); }
+  28%  { transform: scale(1.04) translateX(4px); }
+  42%  { transform: scale(1.06) translateX(-4px); }
+  57%  { transform: scale(1.07) translateX(4px); }
+  85%  { transform: scale(1.07) translateX(-2px); }
+  100% { transform: scale(1.08) translateX(0px); }
+}
+
 /* Shake animation for panel-16 */
 @keyframes shake {
   0%   { transform: translateX(0); }
