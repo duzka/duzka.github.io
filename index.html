@@ -116,7 +116,6 @@
     const playedPanels = new Set();
 
     const PANEL_SOUNDS = {
-      1:  { src: 'sounds/panel-01.mp3', volume: 0.7 },
       17: { src: 'sounds/panel-17.mp3', volume: 0.7 },
       18: { src: 'sounds/panel-18.mp3', volume: 0.7 },
     };
@@ -173,6 +172,21 @@
         a.volume = cfg.volume;
         a.play().catch(() => {});
       } catch (e) {}
+    }
+
+    // ── Panel 1 animation ────────────────────────────────────────────────────
+    function triggerPanel1Animation() {
+      const panel1 = document.querySelector('[data-panel="1"]');
+      // opacity 0→1, translateY(12px)→0 über 600ms (via .visible CSS transition)
+      panel1.classList.add('visible');
+
+      if (audioReady && !muted) {
+        try {
+          const a = new Audio('sounds/panel-01.mp3');
+          a.volume = 0.7;
+          a.play().catch(() => {});
+        } catch (e) {}
+      }
     }
 
     // ── Panel 4 explosion ─────────────────────────────────────────────────────
@@ -246,6 +260,7 @@
       entries.forEach((entry) => {
         if (!entry.isIntersecting) return;
         const el = entry.target;
+        if (el.dataset.panel === '1') { visualObserver.unobserve(el); return; }
         el.classList.add('visible');
         if (el === panel16el) {
           el.classList.remove('shake-active');
@@ -264,7 +279,9 @@
         const panelNum = parseInt(el.dataset.panel, 10);
         if (!playedPanels.has(panelNum)) {
           playedPanels.add(panelNum);
-          if (panelNum === 4) {
+          if (panelNum === 1) {
+            triggerPanel1Animation();
+          } else if (panelNum === 4) {
             triggerPanel4Explosion();
           } else if (audioReady && !muted) {
             playPanelSound(panelNum);

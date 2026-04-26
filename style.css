@@ -61,6 +61,11 @@ header p.subtitle {
   height: auto;
 }
 
+/* Panel 1: sanftere Starttransformation */
+[data-panel="1"] {
+  transform: translateY(12px);
+}
+
 /* Panel 4 explosion */
 [data-panel="4"] {
   position: relative;
