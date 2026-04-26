@@ -180,7 +180,8 @@ header p.subtitle {
 }
 
 .splash-title {
-  font-family: 'Back Issues', 'Bangers', Impact, sans-serif;
+  font-family: 'Quicksand', sans-serif;
+  font-weight: 300;
   font-size: clamp(1.8rem, 5vw, 3.5rem);
   color: white;
   letter-spacing: 0.05em;
@@ -221,7 +222,8 @@ header p.subtitle {
 }
 
 .end-text {
-  font-family: 'Back Issues', 'Bangers', Impact, sans-serif;
+  font-family: 'Quicksand', sans-serif;
+  font-weight: 300;
   font-size: clamp(5rem, 14vw, 10rem);
   color: white;
   letter-spacing: 0.05em;
