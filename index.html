@@ -8,14 +8,13 @@
 </head>
 <body>
 
-  <!-- Hintergrundmusik – ersetze src mit deiner Datei -->
   <audio id="bg-music" loop preload="auto">
-    <source src="audio/background.mp3" type="audio/mpeg" />
-    <source src="audio/background.ogg" type="audio/ogg" />
+    <source src="sounds/music.mp3" type="audio/mpeg" />
   </audio>
 
-  <!-- Mute-Button -->
-  <button id="mute-btn" aria-label="Ton an/aus" title="Ton an/aus">♪</button>
+  <button id="mute-btn" aria-label="Ton ausschalten" title="Ton an/aus">🔊</button>
+
+  <div id="sound-hint">🔊 Klicke irgendwo für Sound</div>
 
   <header>
     <h1>Im System</h1>
@@ -107,40 +106,48 @@
   </footer>
 
   <script>
-    // ── Audio setup ──────────────────────────────────────────────────────────
-    const bgMusic = document.getElementById('bg-music');
-    const muteBtn = document.getElementById('mute-btn');
-    let audioCtx = null;
-    let audioReady = false;
-    let muted = false;
+    // ── State ────────────────────────────────────────────────────────────────
+    const bgMusic   = document.getElementById('bg-music');
+    const muteBtn   = document.getElementById('mute-btn');
+    const soundHint = document.getElementById('sound-hint');
+    let audioReady  = false;
+    let muted       = false;
+    const playedPanels = new Set();
 
+    const PANEL_SOUNDS = {
+      1:  { src: 'sounds/panel-01.mp3', volume: 0.7, delay: 0 },
+      4:  { src: 'sounds/panel-04.mp3', volume: 1.0, delay: 200 },
+      17: { src: 'sounds/panel-17.mp3', volume: 0.7, delay: 0 },
+      18: { src: 'sounds/panel-18.mp3', volume: 0.7, delay: 0 },
+    };
+
+    // ── Init on first interaction ─────────────────────────────────────────────
     function initAudio() {
       if (audioReady) return;
-      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-      bgMusic.volume = 0.7;
-      bgMusic.play().catch(() => {});
       audioReady = true;
+      soundHint.classList.add('hidden');
+      bgMusic.volume = 0.4;
+      bgMusic.play().catch(() => {});
     }
 
-    // Start on first scroll or click (browser autoplay policy)
-    ['scroll', 'click', 'touchstart'].forEach((evt) =>
+    ['click', 'touchstart'].forEach((evt) =>
       document.addEventListener(evt, initAudio, { once: true })
     );
 
+    // ── Mute toggle ───────────────────────────────────────────────────────────
     muteBtn.addEventListener('click', () => {
       muted = !muted;
       bgMusic.muted = muted;
-      muteBtn.textContent = muted ? '♪̶' : '♪';
+      muteBtn.textContent = muted ? '🔇' : '🔊';
       muteBtn.setAttribute('aria-label', muted ? 'Ton einschalten' : 'Ton ausschalten');
       if (!muted && !audioReady) initAudio();
     });
 
-    // ── Volume fade helpers ───────────────────────────────────────────────────
-    function fadeTo(targetVol, durationMs, onDone) {
-      const startVol = bgMusic.volume;
-      const steps = 30;
+    // ── Volume fade ───────────────────────────────────────────────────────────
+    function fadeBgTo(targetVol, durationMs, onDone) {
+      const steps    = 20;
       const interval = durationMs / steps;
-      const delta = (targetVol - startVol) / steps;
+      const delta    = (targetVol - bgMusic.volume) / steps;
       let count = 0;
       const timer = setInterval(() => {
         count++;
@@ -153,149 +160,63 @@
       }, interval);
     }
 
-    function duckAndRestore(durationOut, holdMs, durationIn) {
-      fadeTo(0, durationOut, () => {
-        setTimeout(() => fadeTo(0.7, durationIn), holdMs);
-      });
+    function duckForPanel4() {
+      fadeBgTo(0.15, 300, () => fadeBgTo(0.4, 1000));
     }
 
-    // ── Synthesized sound effects (Web Audio API) ─────────────────────────────
-
-    // Panel 4: Akten-Explosion – tiefes Rumpeln + Rauschen
-    function playExplosion() {
-      if (!audioCtx) return;
-      const now = audioCtx.currentTime;
-
-      // White noise burst
-      const bufLen = Math.floor(audioCtx.sampleRate * 0.8);
-      const buf = audioCtx.createBuffer(1, bufLen, audioCtx.sampleRate);
-      const data = buf.getChannelData(0);
-      for (let i = 0; i < bufLen; i++) {
-        data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / bufLen, 1.5);
-      }
-      const noise = audioCtx.createBufferSource();
-      noise.buffer = buf;
-
-      const noiseFilter = audioCtx.createBiquadFilter();
-      noiseFilter.type = 'bandpass';
-      noiseFilter.frequency.value = 300;
-      noiseFilter.Q.value = 0.5;
-
-      const noiseGain = audioCtx.createGain();
-      noiseGain.gain.setValueAtTime(1.2, now);
-      noiseGain.gain.exponentialRampToValueAtTime(0.001, now + 0.8);
-
-      noise.connect(noiseFilter);
-      noiseFilter.connect(noiseGain);
-      noiseGain.connect(audioCtx.destination);
-      noise.start(now);
-
-      // Low thud
-      const osc = audioCtx.createOscillator();
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(90, now);
-      osc.frequency.exponentialRampToValueAtTime(30, now + 0.5);
-
-      const thudGain = audioCtx.createGain();
-      thudGain.gain.setValueAtTime(1.5, now);
-      thudGain.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
-
-      osc.connect(thudGain);
-      thudGain.connect(audioCtx.destination);
-      osc.start(now);
-      osc.stop(now + 0.5);
+    // ── Panel sound playback ──────────────────────────────────────────────────
+    function playPanelSound(panelNum) {
+      const cfg = PANEL_SOUNDS[panelNum];
+      if (!cfg) return;
+      const fire = () => {
+        try {
+          const a = new Audio(cfg.src);
+          a.volume = cfg.volume;
+          a.play().catch(() => {});
+        } catch (e) {}
+      };
+      cfg.delay > 0 ? setTimeout(fire, cfg.delay) : fire();
     }
 
-    // Panel 16: FUCK THE SYSTEM – aggressiver Buzz + Distortion
-    function playFuckTheSystem() {
-      if (!audioCtx) return;
-      const now = audioCtx.currentTime;
-
-      [55, 110, 165].forEach((freq, i) => {
-        const osc = audioCtx.createOscillator();
-        osc.type = 'sawtooth';
-        osc.frequency.setValueAtTime(freq, now);
-
-        const gain = audioCtx.createGain();
-        gain.gain.setValueAtTime(0.5 - i * 0.1, now);
-        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.6);
-
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
-        osc.start(now);
-        osc.stop(now + 0.6);
-      });
-
-      // High scratch
-      const scratch = audioCtx.createOscillator();
-      scratch.type = 'square';
-      scratch.frequency.setValueAtTime(800, now);
-      scratch.frequency.linearRampToValueAtTime(200, now + 0.15);
-
-      const scratchGain = audioCtx.createGain();
-      scratchGain.gain.setValueAtTime(0.3, now);
-      scratchGain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
-
-      scratch.connect(scratchGain);
-      scratchGain.connect(audioCtx.destination);
-      scratch.start(now);
-      scratch.stop(now + 0.15);
-    }
-
-    // Panel 20: Abschluss – sanfte Dur-Terz (C-E-G)
-    function playEnding() {
-      if (!audioCtx) return;
-      const now = audioCtx.currentTime;
-
-      [523.25, 659.25, 783.99].forEach((freq, i) => {
-        const osc = audioCtx.createOscillator();
-        osc.type = 'sine';
-        osc.frequency.value = freq;
-
-        const gain = audioCtx.createGain();
-        gain.gain.setValueAtTime(0, now + i * 0.15);
-        gain.gain.linearRampToValueAtTime(0.25, now + i * 0.15 + 0.02);
-        gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.15 + 2.0);
-
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
-        osc.start(now + i * 0.15);
-        osc.stop(now + i * 0.15 + 2.0);
-      });
-    }
-
-    // ── IntersectionObserver ──────────────────────────────────────────────────
+    // ── Observers ─────────────────────────────────────────────────────────────
     const panel16el = document.getElementById('panel-16');
 
-    const SOUND_PANELS = {
-      4:  () => { duckAndRestore(400, 800, 800); playExplosion(); },
-      16: () => { duckAndRestore(200, 700, 600); playFuckTheSystem(); },
-      20: () => { duckAndRestore(600, 2000, 1200); playEnding(); },
-    };
-
-    const observer = new IntersectionObserver((entries) => {
+    // Visual: fade-in + shake (threshold 0.15)
+    const visualObserver = new IntersectionObserver((entries) => {
       entries.forEach((entry) => {
         if (!entry.isIntersecting) return;
-
         const el = entry.target;
         el.classList.add('visible');
-
         if (el === panel16el) {
           el.classList.remove('shake-active');
           void el.offsetWidth;
           el.classList.add('shake-active');
         }
-
-        const panelNum = parseInt(el.dataset.panel, 10);
-        if (SOUND_PANELS[panelNum] && audioReady && !muted) {
-          SOUND_PANELS[panelNum]();
-        }
-
-        observer.unobserve(el);
+        visualObserver.unobserve(el);
       });
     }, { threshold: 0.15 });
 
-    document.querySelectorAll('.panel').forEach((p) => observer.observe(p));
+    // Sound: panel sounds + ducking (threshold 0.4)
+    const soundObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        const el       = entry.target;
+        const panelNum = parseInt(el.dataset.panel, 10);
+        if (!playedPanels.has(panelNum)) {
+          playedPanels.add(panelNum);
+          if (audioReady && !muted) {
+            if (panelNum === 4) duckForPanel4();
+            playPanelSound(panelNum);
+          }
+        }
+        soundObserver.unobserve(el);
+      });
+    }, { threshold: 0.4 });
+
+    document.querySelectorAll('.panel').forEach((p) => {
+      visualObserver.observe(p);
+      soundObserver.observe(p);
+    });
   </script>
 
 </body>
