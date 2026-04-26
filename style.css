@@ -1,3 +1,10 @@
+@font-face {
+  font-family: 'Back Issues';
+  src: url('fonts/back-issues/BackIssuesBB_reg.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+
 *, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
@@ -173,19 +180,17 @@ header p.subtitle {
 }
 
 .splash-title {
-  font-family: 'Palatino Linotype', Palatino, 'Book Antiqua', serif;
-  font-style: italic;
-  font-size: clamp(2.5rem, 8vw, 5rem);
+  font-family: 'Back Issues', 'Bangers', Impact, sans-serif;
+  font-size: clamp(3rem, 10vw, 6rem);
   color: white;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.05em;
   text-align: center;
-  transform: rotate(-1deg);
   animation: splash-in 600ms ease-out both;
 }
 
 @keyframes splash-in {
-  from { opacity: 0; transform: translateY(10px) rotate(-1deg); }
-  to   { opacity: 1; transform: translateY(0)    rotate(-1deg); }
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
 #start-btn {
@@ -216,13 +221,12 @@ header p.subtitle {
 }
 
 .end-text {
-  font-family: 'Palatino Linotype', Palatino, 'Book Antiqua', serif;
-  font-style: italic;
-  font-size: clamp(4rem, 12vw, 8rem);
+  font-family: 'Back Issues', 'Bangers', Impact, sans-serif;
+  font-size: clamp(5rem, 14vw, 10rem);
   color: white;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.05em;
   opacity: 0;
-  transform: translateY(10px) rotate(-1deg);
+  transform: translateY(10px);
 }
 
 footer {
