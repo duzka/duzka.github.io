@@ -73,8 +73,9 @@ header p.subtitle {
   transform: translateY(12px);
 }
 
-/* Panel 4 + 16 brauchen position:relative für Overlays */
+/* Panel 4, 15 + 16 brauchen position:relative für Overlays */
 [data-panel="4"],
+#panel-15,
 #panel-16 {
   position: relative;
 }

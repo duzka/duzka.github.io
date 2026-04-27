@@ -83,7 +83,8 @@
       <img src="slides/Panel14.03.jpg" alt="Kinder überfordert. Eltern überfordert." />
     </div>
 
-    <div class="panel" data-panel="15">
+    <div class="panel full-width" id="panel-15" data-panel="15">
+      <div class="red-overlay"></div>
       <img src="slides/Panel15.03.jpg" alt="Und ich saß da und dachte nur:" />
     </div>
 
@@ -204,6 +205,51 @@
     }
 
     // ── Panel 16 – roter Blitz + Screen-Shake + Sound ────────────────────────
+    let panel15Played = false;
+
+    function triggerPanel15() {
+      if (panel15Played) return;
+      panel15Played = true;
+
+      const panel15 = document.getElementById('panel-15');
+      const img = panel15.querySelector('img');
+      const redOverlay = panel15.querySelector('.red-overlay');
+
+      // Phase 1: Roter Blitz
+      redOverlay.style.transition = 'opacity 60ms ease-in';
+      redOverlay.style.opacity    = '0.75';
+      setTimeout(() => {
+        redOverlay.style.transition = 'opacity 60ms ease-out';
+        redOverlay.style.opacity    = '0';
+      }, 60);
+
+      // Phase 2: Screen-Shake + Bild-Rotation
+      setTimeout(() => {
+        document.body.classList.remove('shake');
+        void document.body.offsetWidth;
+        document.body.classList.add('shake');
+
+        img.style.transition = 'transform 140ms ease-in-out';
+        img.style.transform  = 'rotate(-1.5deg)';
+        setTimeout(() => {
+          img.style.transform = 'rotate(1.5deg)';
+          setTimeout(() => {
+            img.style.transform = 'rotate(0deg)';
+          }, 140);
+        }, 140);
+      }, 80);
+
+      // Phase 3: Shake-Klasse entfernen
+      setTimeout(() => {
+        document.body.classList.remove('shake');
+      }, 500);
+
+      setTimeout(() => {
+        img.style.transition = 'transform 200ms ease-out';
+        img.style.transform  = 'rotate(0deg)';
+      }, 1500);
+    }
+
     function triggerPanel16() {
       if (panel16Played) return;
       panel16Played = true;
@@ -349,6 +395,8 @@
             triggerPanel1Animation();
           } else if (panelNum === 4) {
             triggerPanel4Explosion();
+          } else if (panelNum === 15) {
+            triggerPanel15();
           } else if (panelNum === 16) {
             triggerPanel16();
           } else if (audioReady && !muted) {
