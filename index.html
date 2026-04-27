@@ -88,7 +88,7 @@
       <img src="slides/Panel15.03.jpg" alt="Und ich saß da und dachte nur:" />
     </div>
 
-    <div class="panel full-width" id="panel-16" data-panel="16">
+    <div class="panel" id="panel-16" data-panel="16">
       <div class="red-overlay"></div>
       <img src="slides/Panel16.03.jpg" alt="FUCK THE SYSTEM." />
     </div>
@@ -215,6 +215,18 @@
       const img = panel15.querySelector('img');
       const redOverlay = panel15.querySelector('.red-overlay');
 
+      // Sound + Musik-Ducking
+      if (audioReady && !muted) {
+        try {
+          panel16Audio = new Audio('sounds/panel-16.mp3');
+          panel16Audio.volume = 1.0;
+          panel16Audio.play().catch(() => {});
+        } catch (e) {}
+        fadeBgTo(0.15, 300, () => {
+          setTimeout(() => fadeBgTo(0.4, 1000), 2000);
+        });
+      }
+
       // Phase 1: Roter Blitz
       redOverlay.style.transition = 'opacity 60ms ease-in';
       redOverlay.style.opacity    = '0.75';
@@ -257,18 +269,6 @@
       const panel16  = document.getElementById('panel-16');
       const img      = panel16.querySelector('img');
       const redOverlay = panel16.querySelector('.red-overlay');
-
-      // Sound + Musik-Ducking
-      if (audioReady && !muted) {
-        try {
-          panel16Audio = new Audio('sounds/panel-16.mp3');
-          panel16Audio.volume = 1.0;
-          panel16Audio.play().catch(() => {});
-        } catch (e) {}
-        fadeBgTo(0.15, 300, () => {
-          setTimeout(() => fadeBgTo(0.4, 1000), 2000);
-        });
-      }
 
       // Phase 1 (0–120ms): Roter Blitz
       redOverlay.style.transition = 'opacity 60ms ease-in';
