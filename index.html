@@ -445,15 +445,20 @@
       screen.classList.add('hidden');
       setTimeout(() => {
         screen.style.display = 'none';
-        // Fokus auf Hauptinhalt verschieben (WCAG 2.4.3)
         const main = document.getElementById('main-content');
         main.setAttribute('tabindex', '-1');
         main.focus({ preventScroll: true });
         setTimeout(() => main.removeAttribute('tabindex'), 1000);
       }, 800);
 
+      const isMobile = window.innerWidth <= 768;
+
       document.querySelectorAll('.panel').forEach((p) => {
-        visualObserver.observe(p);
+        // Auf Mobile: CSS zeigt alle Panels direkt (opacity:1 via Media Query).
+        // Auf Desktop: IntersectionObserver steuert das Scroll-Reveal.
+        if (!isMobile) {
+          visualObserver.observe(p);
+        }
         soundObserver.observe(p);
       });
 

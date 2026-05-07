@@ -5,6 +5,7 @@
   font-style: normal;
 }
 
+/* ── Reset ───────────────────────────────────────────────────────────────── */
 *, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
@@ -12,10 +13,16 @@
 }
 
 body {
+  overflow-x: hidden;
   background-color: #111111;
   color: #ffffff;
   font-family: 'Georgia', serif;
   min-height: 100vh;
+}
+
+/* Entfernt 300ms Tap-Verzögerung auf mobilen Browsern */
+button, a {
+  touch-action: manipulation;
 }
 
 /* ── Globale Focus-Indikatoren ───────────────────────────────────────────── */
@@ -25,7 +32,7 @@ body {
   border-radius: 4px;
 }
 
-/* ── Visually hidden (für Screenreader-only Text) ───────────────────────── */
+/* ── Visually hidden ─────────────────────────────────────────────────────── */
 .sr-only {
   position: absolute;
   width: 1px;
@@ -38,6 +45,7 @@ body {
   border: 0;
 }
 
+/* ── Header ──────────────────────────────────────────────────────────────── */
 header {
   text-align: center;
   padding: 2.5rem 1rem 1.5rem;
@@ -57,6 +65,7 @@ header p.subtitle {
   font-style: italic;
 }
 
+/* ── Comic Grid ──────────────────────────────────────────────────────────── */
 .comic-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -86,6 +95,7 @@ header p.subtitle {
   display: block;
   width: 100%;
   height: auto;
+  max-width: 100%;
 }
 
 /* Panel 1: sanftere Starttransformation */
@@ -100,6 +110,7 @@ header p.subtitle {
   position: relative;
 }
 
+/* ── Overlays ────────────────────────────────────────────────────────────── */
 .red-overlay {
   position: absolute;
   inset: 0;
@@ -109,6 +120,16 @@ header p.subtitle {
   z-index: 10;
 }
 
+.flash-overlay {
+  position: absolute;
+  inset: 0;
+  background: white;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* ── Animationen ─────────────────────────────────────────────────────────── */
 @keyframes screenShake {
   0%   { transform: translateX(0); }
   15%  { transform: translateX(-8px); }
@@ -124,16 +145,6 @@ header p.subtitle {
   animation: screenShake 420ms ease-in-out;
 }
 
-/* Panel 4 explosion */
-.flash-overlay {
-  position: absolute;
-  inset: 0;
-  background: white;
-  opacity: 0;
-  pointer-events: none;
-  z-index: 2;
-}
-
 @keyframes explosion-shake {
   0%   { transform: scale(1.00) translateX(0px); }
   14%  { transform: scale(1.02) translateX(-4px); }
@@ -144,7 +155,6 @@ header p.subtitle {
   100% { transform: scale(1.08) translateX(0px); }
 }
 
-/* Shake animation for panel-16 */
 @keyframes shake {
   0%   { transform: translateX(0); }
   20%  { transform: translateX(-6px); }
@@ -158,29 +168,33 @@ header p.subtitle {
   animation: shake 0.4s ease;
 }
 
-/* Mute button */
+/* ── Mute Button ─────────────────────────────────────────────────────────── */
 #mute-btn {
   position: fixed;
   top: 1rem;
   right: 1rem;
-  z-index: 100;
+  z-index: 300;
   background: rgba(255, 255, 255, 0.08);
   border: 1px solid rgba(255, 255, 255, 0.2);
   color: #ddd;
   font-size: 1.2rem;
-  width: 2.6rem;
-  height: 2.6rem;
+  /* 44px Mindest-Touch-Ziel */
+  width: 2.75rem;
+  height: 2.75rem;
   border-radius: 50%;
   cursor: pointer;
   transition: background 0.2s;
   line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 #mute-btn:hover {
   background: rgba(255, 255, 255, 0.18);
 }
 
-/* Title screen */
+/* ── Title Screen ────────────────────────────────────────────────────────── */
 #title-screen {
   position: fixed;
   inset: 0;
@@ -190,6 +204,8 @@ header p.subtitle {
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  /* Horizontal-Padding verhindert Randüberlauf auf Phones */
+  padding: 2rem 1.5rem 5rem;
   gap: 2rem;
   transition: opacity 0.8s ease;
 }
@@ -202,7 +218,8 @@ header p.subtitle {
 .splash-title {
   font-family: 'Quicksand', sans-serif;
   font-weight: 300;
-  font-size: clamp(1.8rem, 5vw, 3.5rem);
+  /* Skaliert von 1.8rem (Phone) bis 3.5rem (Desktop) */
+  font-size: clamp(1.8rem, 6vw, 3.5rem);
   color: white;
   letter-spacing: 0.05em;
   text-align: center;
@@ -222,6 +239,8 @@ header p.subtitle {
   font-family: 'Quicksand', sans-serif;
   font-size: 1.2rem;
   padding: 0.75rem 2.5rem;
+  /* Mindest-Touch-Ziel 44px */
+  min-height: 44px;
   cursor: pointer;
   transition: border-color 0.2s;
 }
@@ -230,27 +249,29 @@ header p.subtitle {
   border-color: #ffffff;
 }
 
-/* Kontrast korrigiert: #666 → #999 (~7:1 auf #111) */
+/* Kontrast: #999 (~7:1 auf #111) */
 .title-meta {
   font-family: 'Quicksand', sans-serif;
-  font-size: 0.8rem;
+  font-size: clamp(0.75rem, 2vw, 0.8rem);
   color: #999999;
   text-align: center;
   line-height: 1.6;
+  max-width: 40ch;
 }
 
-/* Kontrast korrigiert: #555 → #888 (~5.3:1 auf #111) */
+/* Kontrast: #888 (~5.3:1 auf #111) */
 .title-authors {
   font-family: 'Quicksand', sans-serif;
-  font-size: 0.8rem;
+  font-size: clamp(0.75rem, 2vw, 0.8rem);
   color: #888888;
   text-align: center;
   line-height: 1.6;
+  /* Auf Desktop: absolut unten verankert */
   position: absolute;
   bottom: 2rem;
 }
 
-/* The End page */
+/* ── The End Page ────────────────────────────────────────────────────────── */
 .end-page {
   grid-column: span 2;
   width: 100%;
@@ -261,12 +282,13 @@ header p.subtitle {
   align-items: center;
   justify-content: center;
   gap: 2.5rem;
+  padding: 3rem 1rem;
 }
 
 .end-text {
   font-family: 'Quicksand', sans-serif;
   font-weight: 300;
-  font-size: clamp(5rem, 14vw, 10rem);
+  font-size: clamp(4rem, 14vw, 10rem);
   color: white;
   letter-spacing: 0.05em;
   opacity: 0;
@@ -276,50 +298,44 @@ header p.subtitle {
   text-align: center;
 }
 
-.read-pdf-link {
-  display: block;
+/* Gemeinsame Basis für beide End-Buttons */
+.read-pdf-link,
+.listen-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   font-family: 'Quicksand', sans-serif;
-  font-size: 1.1rem;
+  font-size: clamp(1rem, 3vw, 1.1rem);
   color: #111111;
   text-decoration: none;
   background: #ffffff;
   border: none;
   border-radius: 24px;
+  /* Mindest-Touch-Ziel 44px, komfortable Breite */
+  min-height: 44px;
+  min-width: 200px;
   padding: 0.8rem 2.8rem;
   cursor: pointer;
   opacity: 0;
   transform: translateY(10px);
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.read-pdf-link {
   transition: opacity 600ms ease-out 800ms, transform 600ms ease-out 800ms, background 0.2s;
 }
 
-.read-pdf-link:hover {
-  background: #e0e0e0;
-}
-
 .listen-btn {
-  display: block;
-  font-family: 'Quicksand', sans-serif;
-  font-size: 1.1rem;
-  color: #111111;
-  text-decoration: none;
-  background: #ffffff;
-  border: none;
-  border-radius: 24px;
-  padding: 0.8rem 2.8rem;
-  cursor: pointer;
-  opacity: 0;
-  transform: translateY(10px);
   transition: opacity 600ms ease-out 1000ms, transform 600ms ease-out 1000ms, background 0.2s;
-  -webkit-appearance: none;
-  appearance: none;
-  line-height: normal;
 }
 
+.read-pdf-link:hover,
 .listen-btn:hover {
   background: #e0e0e0;
 }
 
-/* Kontrast korrigiert: #555 → #888 (~5.3:1 auf #111) */
+/* ── Footer ──────────────────────────────────────────────────────────────── */
 footer {
   text-align: center;
   padding: 2.5rem 1rem;
@@ -328,15 +344,81 @@ footer {
   font-style: italic;
 }
 
-/* Mobile: single column */
+/* ── Tablet + Mobile: ≤ 768px ────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  /* Autoren nicht mehr absolut – fließt im Flex-Layout */
+  .title-authors {
+    position: static;
+    margin-top: 0.5rem;
+  }
+
+  #title-screen {
+    padding-bottom: 2rem;
+  }
+
+  /* Panels auf Mobile immer sichtbar.
+     Der Titelbildschirm (z-index:200) verdeckt sie bis "Starten" geklickt wird.
+     Kein JS, keine Klassen, keine Race-Conditions. */
+  .panel,
+  .panel.full-width {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+}
+
+/* ── Mobile: ≤ 600px ─────────────────────────────────────────────────────── */
 @media (max-width: 600px) {
+  /* 1-Spalten-Layout */
   .comic-grid {
     grid-template-columns: 1fr;
+    gap: 2px;
+    padding: 0;
   }
 
   .panel,
   .panel.full-width {
     grid-column: span 1;
+  }
+
+  /* Title Screen kompakter auf kleinen Screens */
+  #title-screen {
+    gap: 1.4rem;
+    padding: 2rem 1.25rem 2rem;
+  }
+
+  .splash-title {
+    font-size: clamp(1.6rem, 9vw, 2.4rem);
+  }
+
+  /* Start-Button auf Mobile: volle Breite mit Max */
+  #start-btn {
+    width: 100%;
+    max-width: 260px;
+  }
+
+  /* Mute-Button etwas weiter vom Rand */
+  #mute-btn {
+    top: 0.75rem;
+    right: 0.75rem;
+  }
+
+  /* End-Buttons: volle Breite auf kleinen Screens */
+  .read-pdf-link,
+  .listen-btn {
+    width: min(280px, 85vw);
+    padding: 0.9rem 1.5rem;
+  }
+
+  .end-page {
+    min-height: 380px;
+    gap: 1.5rem;
+    padding: 2rem 1rem;
+  }
+
+  footer {
+    padding: 1.5rem 1rem;
+    font-size: 0.8rem;
   }
 }
 
@@ -351,14 +433,13 @@ footer {
     scroll-behavior: auto !important;
   }
 
-  /* Panels sofort sichtbar, kein Fade-In */
   .panel {
     transition: none !important;
   }
 
-  /* End-Elemente ohne Transition – JS setzt opacity direkt */
   .end-text,
-  .read-pdf-link {
+  .read-pdf-link,
+  .listen-btn {
     transition: none !important;
   }
 }
