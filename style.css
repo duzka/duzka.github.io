@@ -344,9 +344,8 @@ footer {
   font-style: italic;
 }
 
-/* ── Tablet + Mobile: ≤ 768px ────────────────────────────────────────────── */
+/* ── Tablet: 601px – 768px ───────────────────────────────────────────────── */
 @media (max-width: 768px) {
-  /* Autoren nicht mehr absolut – fließt im Flex-Layout */
   .title-authors {
     position: static;
     margin-top: 0.5rem;
@@ -355,33 +354,41 @@ footer {
   #title-screen {
     padding-bottom: 2rem;
   }
-
-  /* Panels auf Mobile immer sichtbar.
-     Der Titelbildschirm (z-index:200) verdeckt sie bis "Starten" geklickt wird.
-     Kein JS, keine Klassen, keine Race-Conditions. */
-  .panel,
-  .panel.full-width {
-    opacity: 1 !important;
-    transform: none !important;
-    transition: none !important;
-  }
 }
 
 /* ── Mobile: ≤ 600px ─────────────────────────────────────────────────────── */
 @media (max-width: 600px) {
-  /* 1-Spalten-Layout */
+
+  /* Grid vollständig durch Block-Layout ersetzen.
+     grid-column:span 2 auf full-width Panels erzeugt sonst implizite
+     Spalten in einem 1-Spalten-Grid und bricht das Layout. */
   .comic-grid {
-    grid-template-columns: 1fr;
-    gap: 2px;
+    display: block;
     padding: 0;
   }
 
+  /* Jedes Panel als vollbreiter Block untereinander */
   .panel,
   .panel.full-width {
-    grid-column: span 1;
+    display: block;
+    width: 100%;
+    margin-bottom: 2px;
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
   }
 
-  /* Title Screen kompakter auf kleinen Screens */
+  /* End-Seite */
+  .end-page {
+    display: flex;
+    width: 100%;
+    min-height: 380px;
+    gap: 1.5rem;
+    padding: 2rem 1rem;
+    grid-column: unset;
+  }
+
+  /* Title Screen */
   #title-screen {
     gap: 1.4rem;
     padding: 2rem 1.25rem 2rem;
@@ -391,29 +398,20 @@ footer {
     font-size: clamp(1.6rem, 9vw, 2.4rem);
   }
 
-  /* Start-Button auf Mobile: volle Breite mit Max */
   #start-btn {
     width: 100%;
     max-width: 260px;
   }
 
-  /* Mute-Button etwas weiter vom Rand */
   #mute-btn {
     top: 0.75rem;
     right: 0.75rem;
   }
 
-  /* End-Buttons: volle Breite auf kleinen Screens */
   .read-pdf-link,
   .listen-btn {
     width: min(280px, 85vw);
     padding: 0.9rem 1.5rem;
-  }
-
-  .end-page {
-    min-height: 380px;
-    gap: 1.5rem;
-    padding: 2rem 1rem;
   }
 
   footer {
