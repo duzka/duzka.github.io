@@ -18,6 +18,26 @@ body {
   min-height: 100vh;
 }
 
+/* ── Globale Focus-Indikatoren ───────────────────────────────────────────── */
+:focus-visible {
+  outline: 3px solid #ffffff;
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+/* ── Visually hidden (für Screenreader-only Text) ───────────────────────── */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
 header {
   text-align: center;
   padding: 2.5rem 1rem 1.5rem;
@@ -105,7 +125,6 @@ header p.subtitle {
 }
 
 /* Panel 4 explosion */
-
 .flash-overlay {
   position: absolute;
   inset: 0;
@@ -211,18 +230,20 @@ header p.subtitle {
   border-color: #ffffff;
 }
 
+/* Kontrast korrigiert: #666 → #999 (~7:1 auf #111) */
 .title-meta {
   font-family: 'Quicksand', sans-serif;
   font-size: 0.8rem;
-  color: #666;
+  color: #999999;
   text-align: center;
   line-height: 1.6;
 }
 
+/* Kontrast korrigiert: #555 → #888 (~5.3:1 auf #111) */
 .title-authors {
   font-family: 'Quicksand', sans-serif;
   font-size: 0.8rem;
-  color: #555;
+  color: #888888;
   text-align: center;
   line-height: 1.6;
   position: absolute;
@@ -275,10 +296,34 @@ header p.subtitle {
   background: #e0e0e0;
 }
 
+.listen-btn {
+  display: block;
+  font-family: 'Quicksand', sans-serif;
+  font-size: 1.1rem;
+  color: #111111;
+  text-decoration: none;
+  background: #ffffff;
+  border: none;
+  border-radius: 24px;
+  padding: 0.8rem 2.8rem;
+  cursor: pointer;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 600ms ease-out 1000ms, transform 600ms ease-out 1000ms, background 0.2s;
+  -webkit-appearance: none;
+  appearance: none;
+  line-height: normal;
+}
+
+.listen-btn:hover {
+  background: #e0e0e0;
+}
+
+/* Kontrast korrigiert: #555 → #888 (~5.3:1 auf #111) */
 footer {
   text-align: center;
   padding: 2.5rem 1rem;
-  color: #555;
+  color: #888888;
   font-size: 0.85rem;
   font-style: italic;
 }
@@ -292,5 +337,28 @@ footer {
   .panel,
   .panel.full-width {
     grid-column: span 1;
+  }
+}
+
+/* ── prefers-reduced-motion ──────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  /* Panels sofort sichtbar, kein Fade-In */
+  .panel {
+    transition: none !important;
+  }
+
+  /* End-Elemente ohne Transition – JS setzt opacity direkt */
+  .end-text,
+  .read-pdf-link {
+    transition: none !important;
   }
 }

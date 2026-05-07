@@ -11,20 +11,22 @@
 </head>
 <body>
 
-  <audio id="bg-music" loop preload="auto">
+<!-- Hintergrundmusik: aria-hidden, da kein inhaltlicher Wert für Screenreader -->
+  <audio id="bg-music" loop preload="auto" aria-hidden="true">
     <source src="sounds/music.mp3" type="audio/mpeg" />
   </audio>
 
   <button id="mute-btn" aria-label="Ton ausschalten" title="Ton an/aus">🔊</button>
 
-  <div id="title-screen">
-    <h1 class="splash-title">Die Zugfahrt</h1>
+  <!-- Dialog-Rolle + aria-modal für korrekte Screenreader-Semantik (WCAG 4.1.2) -->
+  <div id="title-screen" role="dialog" aria-modal="true" aria-labelledby="dialog-title">
+    <h1 class="splash-title" id="dialog-title">Die Zugfahrt</h1>
     <button id="start-btn">▶ Starten</button>
     <p class="title-meta">Modul 3: Spezifische Methoden der Sozialen Arbeit: Kreativität und Medienpädagogik<br>Prof. Dr. Karsten Krauskopf</p>
     <p class="title-authors">Julia Collatz, Aleksandra Duź, Anne Walter<br>Soziale Arbeit BASA-online</p>
   </div>
 
-  <main class="comic-grid">
+  <main id="main-content" class="comic-grid" aria-label="Comic: Die Zugfahrt">
 
     <div class="panel full-width" data-panel="1">
       <img src="slides/Panel01.03.jpg" alt="Ich saß im Zug, das Gesicht in der Sonne…" />
@@ -39,7 +41,7 @@
     </div>
 
     <div class="panel full-width" data-panel="4">
-      <div class="flash-overlay"></div>
+      <div class="flash-overlay" aria-hidden="true"></div>
       <img src="slides/Panel04.03.jpg" alt="Akten explodieren – das System kollabiert" />
     </div>
 
@@ -84,12 +86,12 @@
     </div>
 
     <div class="panel full-width" id="panel-15" data-panel="15">
-      <div class="red-overlay"></div>
+      <div class="red-overlay" aria-hidden="true"></div>
       <img src="slides/Panel15.03.jpg" alt="Und ich saß da und dachte nur:" />
     </div>
 
     <div class="panel" id="panel-16" data-panel="16">
-      <div class="red-overlay"></div>
+      <div class="red-overlay" aria-hidden="true"></div>
       <img src="slides/Panel16.03.jpg" alt="FUCK THE SYSTEM." />
     </div>
 
@@ -105,9 +107,15 @@
       <img src="slides/Panel19.03.jpg" alt="Zwei Kinder auf einem Bahnsteig winken dem Zug hinterher. Einfach so. Ohne Grund." />
     </div>
 
-    <div id="end-page" class="end-page">
-      <div class="end-text">The End</div>
-      <a id="read-pdf-link" class="read-pdf-link" href="Die%20Zugfahrt.pdf" target="_blank">Lese die Geschichte</a>
+    <div id="end-page" class="end-page" aria-label="Ende der Geschichte">
+      <div class="end-text" aria-live="polite">The End</div>
+      <a id="read-pdf-link" class="read-pdf-link" href="Die%20Zugfahrt.pdf" target="_blank">
+        Lese die Geschichte
+      </a>
+      <audio id="story-audio" src="Die%20Zugfahrt_audio.mp3" preload="none"></audio>
+      <button id="listen-btn" class="listen-btn" aria-label="Höre die Geschichte – Audio abspielen">
+        ▶ Höre die Geschichte
+      </button>
     </div>
 
   </main>
@@ -117,10 +125,12 @@
   </footer>
 
   <script>
+    // ── prefers-reduced-motion ────────────────────────────────────────────────
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
     // ── State ────────────────────────────────────────────────────────────────
     const bgMusic   = document.getElementById('bg-music');
     const muteBtn   = document.getElementById('mute-btn');
-    const soundHint = document.getElementById('sound-hint');
     let audioReady  = false;
     let muted       = false;
     let panel1Played  = false;
@@ -144,10 +154,8 @@
     function initAudio() {
       if (audioReady) return;
       audioReady = true;
-      if (soundHint) soundHint.classList.add('hidden');
       bgMusic.volume = 0.4;
       bgMusic.play().catch(() => {});
-      // Stelle A: Panel 1 war schon sichtbar bevor User geklickt hat
       if (playedPanels.has(1) && !muted) playPanel1Sound();
     }
 
@@ -166,6 +174,11 @@
 
     // ── Volume fade ───────────────────────────────────────────────────────────
     function fadeBgTo(targetVol, durationMs, onDone) {
+      if (prefersReducedMotion || durationMs <= 0) {
+        bgMusic.volume = targetVol;
+        if (onDone) onDone();
+        return;
+      }
       const steps    = 20;
       const interval = durationMs / steps;
       const delta    = (targetVol - bgMusic.volume) / steps;
@@ -199,21 +212,19 @@
     // ── Panel 1 animation ────────────────────────────────────────────────────
     function triggerPanel1Animation() {
       const panel1 = document.querySelector('[data-panel="1"]');
-      // opacity 0→1, translateY(12px)→0 über 600ms (via .visible CSS transition)
       panel1.classList.add('visible');
-      // Stelle B: User hat schon geklickt → Sound sofort abspielen
       if (audioReady && !muted) playPanel1Sound();
     }
 
-    // ── Panel 16 – roter Blitz + Screen-Shake + Sound ────────────────────────
+    // ── Panel 15 – roter Blitz + Screen-Shake + Sound ────────────────────────
     let panel15Played = false;
 
     function triggerPanel15() {
       if (panel15Played) return;
       panel15Played = true;
 
-      const panel15 = document.getElementById('panel-15');
-      const img = panel15.querySelector('img');
+      const panel15    = document.getElementById('panel-15');
+      const img        = panel15.querySelector('img');
       const redOverlay = panel15.querySelector('.red-overlay');
 
       // Sound + Musik-Ducking
@@ -227,6 +238,9 @@
           setTimeout(() => fadeBgTo(0.4, 1000), 2000);
         });
       }
+
+      // Animationen überspringen wenn prefers-reduced-motion aktiv
+      if (prefersReducedMotion) return;
 
       // Phase 1: Roter Blitz
       redOverlay.style.transition = 'opacity 60ms ease-in';
@@ -267,6 +281,8 @@
       if (panel16Played) return;
       panel16Played = true;
 
+      if (prefersReducedMotion) return;
+
       const panel16    = document.getElementById('panel-16');
       const redOverlay = panel16.querySelector('.red-overlay');
 
@@ -285,7 +301,6 @@
       const img    = panel4.querySelector('img');
       const flash  = panel4.querySelector('.flash-overlay');
 
-      // Sound + ducking start simultaneously with animation
       if (audioReady && !muted) {
         duckForPanel4();
         try {
@@ -294,6 +309,9 @@
           a.play().catch(() => {});
         } catch (e) {}
       }
+
+      // Animationen überspringen wenn prefers-reduced-motion aktiv
+      if (prefersReducedMotion) return;
 
       // Phase 1 (0–150ms): scale up + shake via CSS keyframe
       img.style.animation = 'explosion-shake 150ms ease-in forwards';
@@ -305,7 +323,6 @@
         img.style.transform  = 'scale(1.35)';
         img.style.filter     = 'blur(4px) brightness(1.8)';
 
-        // Weißer Blitz: 0 → 0.85 → 0
         flash.style.transition = 'opacity 60ms ease-in';
         flash.style.opacity    = '0.85';
         setTimeout(() => {
@@ -335,7 +352,7 @@
         img.style.filter     = 'blur(0px) brightness(1.0)';
       }, 650);
 
-      // Phase 4 (700ms): zurück auf Normal, ease-out
+      // Phase 4 (700ms): zurück auf Normal
       setTimeout(() => {
         img.style.transition = 'transform 500ms ease-out';
         img.style.transform  = 'scale(1.0)';
@@ -345,7 +362,7 @@
     // ── Observers ─────────────────────────────────────────────────────────────
     const panel16el = document.getElementById('panel-16');
 
-    // Visual: fade-in + shake (threshold 0.15)
+    // Visual: fade-in (threshold 0.15)
     const visualObserver = new IntersectionObserver((entries) => {
       entries.forEach((entry) => {
         if (!entry.isIntersecting) return;
@@ -383,22 +400,58 @@
     // ── The End – Animation + Musikfade ──────────────────────────────────────
     function animateEndPage() {
       const text = document.querySelector('#end-page .end-text');
-      text.style.transition = 'opacity 600ms ease-out, transform 600ms ease-out';
+      const link = document.getElementById('read-pdf-link');
+
+      if (!prefersReducedMotion) {
+        text.style.transition = 'opacity 600ms ease-out, transform 600ms ease-out';
+      }
       text.style.opacity    = '1';
       text.style.transform  = 'translateY(0)';
-      fadeBgTo(0, 3000);
+      fadeBgTo(0, prefersReducedMotion ? 0 : 3000);
 
-      const link = document.getElementById('read-pdf-link');
       link.style.opacity   = '1';
       link.style.transform = 'translateY(0)';
+
+      const listenBtn = document.getElementById('listen-btn');
+      listenBtn.style.opacity   = '1';
+      listenBtn.style.transform = 'translateY(0)';
     }
+
+    // ── Höre die Geschichte – Play/Pause ──────────────────────────────────────
+    const storyAudio = document.getElementById('story-audio');
+    const listenBtn  = document.getElementById('listen-btn');
+
+    listenBtn.addEventListener('click', () => {
+      if (storyAudio.paused) {
+        storyAudio.play();
+        listenBtn.textContent = '⏸ Pause';
+        listenBtn.setAttribute('aria-label', 'Audio pausieren');
+      } else {
+        storyAudio.pause();
+        listenBtn.textContent = '▶ Höre die Geschichte';
+        listenBtn.setAttribute('aria-label', 'Höre die Geschichte – Audio abspielen');
+      }
+    });
+
+    storyAudio.addEventListener('ended', () => {
+      listenBtn.textContent = '▶ Höre die Geschichte';
+      listenBtn.setAttribute('aria-label', 'Höre die Geschichte – Audio abspielen');
+    });
 
     // ── Starten-Button ────────────────────────────────────────────────────────
     function startComic() {
       initAudio();
       const screen = document.getElementById('title-screen');
       screen.classList.add('hidden');
-      setTimeout(() => { screen.style.display = 'none'; }, 800);
+      setTimeout(() => {
+        screen.style.display = 'none';
+        // Fokus auf Hauptinhalt verschieben (WCAG 2.4.3)
+        const main = document.getElementById('main-content');
+        main.setAttribute('tabindex', '-1');
+        main.focus({ preventScroll: true });
+        setTimeout(() => main.removeAttribute('tabindex'), 1000);
+      }, 800);
+
       document.querySelectorAll('.panel').forEach((p) => {
         visualObserver.observe(p);
         soundObserver.observe(p);
@@ -459,6 +512,9 @@
     }
 
     document.getElementById('start-btn').addEventListener('click', startComic);
+
+    // Initialen Fokus auf Start-Button setzen (WCAG 2.4.3)
+    document.getElementById('start-btn').focus();
   </script>
 
 </body>
