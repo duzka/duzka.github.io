@@ -107,6 +107,7 @@
 
     <div id="end-page" class="end-page">
       <div class="end-text">The End</div>
+      <a id="read-pdf-link" class="read-pdf-link" href="Die%20Zugfahrt.pdf" target="_blank">Lese die Geschichte</a>
     </div>
 
   </main>
@@ -266,44 +267,16 @@
       if (panel16Played) return;
       panel16Played = true;
 
-      const panel16  = document.getElementById('panel-16');
-      const img      = panel16.querySelector('img');
+      const panel16    = document.getElementById('panel-16');
       const redOverlay = panel16.querySelector('.red-overlay');
 
-      // Phase 1 (0–120ms): Roter Blitz
+      // Roter Blitz
       redOverlay.style.transition = 'opacity 60ms ease-in';
       redOverlay.style.opacity    = '0.75';
       setTimeout(() => {
         redOverlay.style.transition = 'opacity 60ms ease-out';
         redOverlay.style.opacity    = '0';
       }, 60);
-
-      // Phase 2 (80ms): Screen-Shake + Bild-Rotation
-      setTimeout(() => {
-        document.body.classList.remove('shake');
-        void document.body.offsetWidth;
-        document.body.classList.add('shake');
-
-        img.style.transition = 'transform 140ms ease-in-out';
-        img.style.transform  = 'rotate(-1.5deg)';
-        setTimeout(() => {
-          img.style.transform = 'rotate(1.5deg)';
-          setTimeout(() => {
-            img.style.transform = 'rotate(0deg)';
-          }, 140);
-        }, 140);
-      }, 80);
-
-      // Phase 3 (500ms): Shake-Klasse entfernen
-      setTimeout(() => {
-        document.body.classList.remove('shake');
-      }, 500);
-
-      // Phase 3 Ende (1500ms): Sicherheits-Reset
-      setTimeout(() => {
-        img.style.transition = 'transform 200ms ease-out';
-        img.style.transform  = 'rotate(0deg)';
-      }, 1500);
     }
 
     // ── Panel 4 explosion ─────────────────────────────────────────────────────
@@ -414,6 +387,10 @@
       text.style.opacity    = '1';
       text.style.transform  = 'translateY(0)';
       fadeBgTo(0, 3000);
+
+      const link = document.getElementById('read-pdf-link');
+      link.style.opacity   = '1';
+      link.style.transform = 'translateY(0)';
     }
 
     // ── Starten-Button ────────────────────────────────────────────────────────
