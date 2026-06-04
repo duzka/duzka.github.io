@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Im System – Alltag in der Sozialen Arbeit</title>
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css?v=2" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300..700&display=swap" rel="stylesheet">
@@ -23,7 +23,7 @@
     <h1 class="splash-title" id="dialog-title">Die Zugfahrt</h1>
     <button id="start-btn">▶ Starten</button>
     <p class="title-meta">Modul 3: Spezifische Methoden der Sozialen Arbeit: Kreativität und Medienpädagogik<br>Prof. Dr. Karsten Krauskopf</p>
-    <p class="title-authors">Julia Collatz, Aleksandra Duź, Anne Walter<br>Soziale Arbeit BASA-online</p>
+    <p class="title-authors">Julia Collatz, Stefanie Dettmann, Aleksandra Duź, Anne Walter<br>Soziale Arbeit BASA-online</p>
   </div>
 
   <main id="main-content" class="comic-grid" aria-label="Comic: Die Zugfahrt">
@@ -120,6 +120,10 @@
 
   </main>
 
+  <div id="credits-page" class="credits-page">
+    <p class="credits-text">Konzept, Text und Umsetzung: Julia Collatz, Stefanie Dettmann, Aleksandra Duź, Anne Walter<br>Bilder erstellt mit Künstlicher Intelligenz (KI)</p>
+  </div>
+
 
   <script>
     // ── prefers-reduced-motion ────────────────────────────────────────────────
@@ -142,7 +146,7 @@
     function playPanel1Sound() {
       if (panel1Played) return;
       panel1Played = true;
-      panel1Audio = new Audio('sounds/panel-01.mp3');
+      panel1Audio = new Audio('sounds/panel-01.mp3?v=4');
       panel1Audio.volume = 0.35;
       panel1Audio.play().catch(() => {});
     }
